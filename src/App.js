@@ -1,16 +1,12 @@
 //import logo from './logo.svg';
 import './App.css';
-//import { googleCalendarSync, Eventcalendar, CalendarNav, SegmentedGroup, SegmentedItem, CalendarPrev, CalendarToday, CalendarNext, toast } from '@mobiscroll/react';
-import CreateEventComponent from './CreateEventComponent';
 import FullCalendar from "@fullcalendar/react";
 import daygridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { useState, useEffect } from "react";
 import { useSession, useSupabaseClient, useSessionContext } from '@supabase/auth-helpers-react';
-import DateTimePicker from 'react-datetime-picker';
-import googleCalendarPlugin from '@fullcalendar/google-calendar';
+import DesktopDateTimePicker from 'react-datetime-picker';
 
-//const CALENDAR_ID = 'en.usa#holiday@group.v.calendar.google.com';
 
 function App() {
   const [events, setEvents] = useState([]);
@@ -22,12 +18,40 @@ function App() {
   const [ start, setStart ] = useState(new Date());
     const [ end, setEnd ] = useState(new Date());
     const [ eventName, setEventName ] = useState("");
-    const [ eventDescription, setEventDescription ] = useState("");
-  
+
+   
+  var showevent=[];
+
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  		
+  	useEffect(() => {
+    	function onlineHandler() {
+      		setIsOnline(true);
+    	}
+	
+    	function offlineHandler() {
+      		setIsOnline(false);
+    	}
+	
+    	window.addEventListener("online", onlineHandler);
+    	window.addEventListener("offline", offlineHandler);
+
+	
+    	return () => {
+      		window.removeEventListener("online", onlineHandler);
+      		window.removeEventListener("offline", offlineHandler);
+    	};
+  	}, []);
+    
+    console.log("online status "+isOnline);
+
+    
+
   if(isLoading) {
     return <></>
   }
 
+  
   async function googleSignIn() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -35,20 +59,20 @@ function App() {
         scopes: 'https://www.googleapis.com/auth/calendar'
       }
     });
-    if(error) {
+    if(error)
       alert("Error logging in to Google provider with Supabase");
       console.log(error);
-    }
+    
   }
 
   async function signOut() {
     await supabase.auth.signOut();
   }
+ 
 
-  async function listCalendarEvent()  { 
-   
+  async function listCalendarEvent()  {          
     console.log("List events");
-   
+
      fetch("https://www.googleapis.com/calendar/v3/calendars/primary/events", {
       method: "GET",
       headers: {
@@ -61,17 +85,34 @@ function App() {
       setEvents(data);
       //alert("Event load");
       //console.log(data);
-      //console.log(events)
+      console.log(events);
+      
     }).catch((err) => {
       console.log(err.message);
   });
 }
-console.log(events)
+
+var islist;
+//Convert eventlist to JSON object
+if (events.length!=0){islist=true;}
+//console.log(islist)
+//console.log(events.items[4].start.dateTime)
+//console.log(events.items[0].summary)
+// var showevent=[];
+if(islist==true){
+for (var i=0; i<events.items.length;i++){
+  showevent.push({ 
+    title: events.items[i].summary,
+    date: events.items[i].start.dateTime
+
+});
+};} 
+
+
 async function createCalendarEvent() {
   console.log("Creating calendar event");
   const event = {
     'summary': eventName,
-    'description': eventDescription,
     'start': {
       'dateTime': start.toISOString(), // Date.toISOString() ->
       'timeZone': Intl.DateTimeFormat().resolvedOptions().timeZone // America/Los_Angeles
@@ -93,6 +134,7 @@ async function createCalendarEvent() {
     console.log(data);
     alert("Event created, check your Google Calendar!");
   });
+  
 }
 
 
@@ -103,13 +145,13 @@ async function createCalendarEvent() {
     <>
       <h2>Hey there {session.user.email}</h2>
       <p>Start of your event</p>
-      <DateTimePicker onChange={setStart} value={start} />
+      <DesktopDateTimePicker onChange={setStart} value={start} 
+      calendarClassName="rasta-stripes"/>
       <p>End of your event</p>
-      <DateTimePicker onChange={setEnd} value={end} />
+      <DesktopDateTimePicker onChange={setEnd} value={end} />
       <p>Event name</p>
       <input type="text" onChange={(e) => setEventName(e.target.value)} />
-      <p>Event description</p>
-      <input type="text" onChange={(e) => setEventDescription(e.target.value)} />
+      
       <hr />
       <button onClick={() => createCalendarEvent()}>Create Calendar Event</button>
       <hr />
@@ -128,8 +170,8 @@ async function createCalendarEvent() {
         editable
         selectable
      
-        eventSources={
-          events.items
+        events={showevent
+          
         }
 
         headerToolbar={{
