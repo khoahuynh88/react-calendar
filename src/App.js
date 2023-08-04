@@ -3,7 +3,7 @@ import "./App.css";
 import FullCalendar from "@fullcalendar/react";
 import daygridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   useSession,
   useSupabaseClient,
@@ -74,17 +74,19 @@ function App() {
     }
   }
 
-  function handleClick() {
+  const handleClick = () => {
     setShowComponent(!showComponent); // Toggle the value of showComponent on each click
-  }
+  };
 
   return (
     <div className="App">
-      <div>
+      <div className="hello">
         {session ? (
           <>
-            <h2>Hey there {session.user.email}</h2>
-            <button onClick={() => signOut()}>Sign Out</button>
+            <h4>Hey there {session.user.email}</h4>
+            <button className="right" onClick={() => signOut()}>
+              Sign Out
+            </button>
           </>
         ) : (
           <>
@@ -92,32 +94,40 @@ function App() {
           </>
         )}
       </div>
-      <div>{showComponent ? <CreateEventComponent /> : <p></p>}</div>
-      <FullCalendar
-        editable
-        selectable
-        events={showevent}
-        customButtons={{
-          myCustomButton: {
-            text: "+",
-            click: () => {
-              handleClick();
+      <div>
+        {showComponent ? (
+          <CreateEventComponent doIt={listCalendarEvent} />
+        ) : (
+          <p></p>
+        )}
+      </div>
+      <div>
+        <FullCalendar
+          editable
+          selectable
+          events={showevent}
+          customButtons={{
+            myCustomButton: {
+              text: "+",
+              click: () => {
+                handleClick();
+              },
             },
-          },
-          listEvent: {
-            text: "List Event",
-            click: () => {
-              listCalendarEvent();
+            listEvent: {
+              text: "List Event",
+              click: () => {
+                listCalendarEvent();
+              },
             },
-          },
-        }}
-        headerToolbar={{
-          start: "myCustomButton today prev next",
-          end: "listEvent dayGridMonth dayGridWeek dayGridDay",
-        }}
-        plugins={[daygridPlugin, interactionPlugin]}
-        views={["dayGridMonth", "dayGridWeek", "dayGridDay"]}
-      />
+          }}
+          headerToolbar={{
+            start: "myCustomButton today prev next",
+            end: "listEvent dayGridMonth dayGridWeek dayGridDay",
+          }}
+          plugins={[daygridPlugin, interactionPlugin]}
+          views={["dayGridMonth", "dayGridWeek", "dayGridDay"]}
+        />
+      </div>
     </div>
   );
 }

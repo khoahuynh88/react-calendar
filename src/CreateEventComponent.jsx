@@ -5,8 +5,9 @@ import { useState, useEffect } from "react";
 import "react-datetime-picker/dist/DateTimePicker.css";
 import "react-calendar/dist/Calendar.css";
 import "react-clock/dist/Clock.css";
+import "./App.css";
 
-const CreateEventComponent = () => {
+const CreateEventComponent = (props) => {
   const [start, setStart] = useState(new Date());
   const [end, setEnd] = useState(new Date());
   const [eventName, setEventName] = useState("");
@@ -111,19 +112,31 @@ const CreateEventComponent = () => {
   // console.log(start);
   // console.log(eventName);
   // console.log(eventDescription);
+  async function waitlist() {
+    await createCalendarEvent();
+    props.doIt();
+  }
+
+  const submit = () => {
+    //createCalendarEvent();
+    waitlist();
+  };
+
   return (
     <div className="App">
-      <div>
+      <div className="evenform">
         {showForm ? (
           <>
+            <p className="introtext">Start of your event:&nbsp;&nbsp; </p>
             <DateTimePicker onChange={setStart} value={start} />
-            <p>End of your event</p>
+            <p>&nbsp;&nbsp;</p>
+            <p className="introtext">End of your event: &nbsp;&nbsp; </p>
             <DateTimePicker onChange={setEnd} value={end} />
-            <p>Event name</p>
+            <p>&nbsp;&nbsp;</p>
+            <p className="introtext">Event name: &nbsp;&nbsp; </p>
             <input type="text" onChange={(e) => setEventName(e.target.value)} />
-            <p>Event description</p>
-
-            <button onClick={() => createCalendarEvent()}>submit</button>
+            <br></br>
+            <button onClick={() => submit()}>Submit</button>
             <button onClick={() => setShowForm(false)}>Exit</button>
             <p></p>
           </>

@@ -28,11 +28,31 @@
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.evenform {
+  margin: auto;
+  width: 80%;
+  padding: 10px;
+}
+.hello {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+h4 {
+  color: rgb(0, 119, 255);
+  text-align: center;
+}
+
+p {
+  display: inline-block;
+}
+.introtext {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-size: 120%;
+  font-weight: 200;
+}
+.right {
+  position: absolute;
+  right: 0;
 }
